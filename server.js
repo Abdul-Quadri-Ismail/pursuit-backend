@@ -13,9 +13,16 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.json(
-    JSON.parse(fs.readFileSync(path.resolve(__dirname, "_data/feed.json")))
-  );
+  console.log(req.query);
+  //description //Python developer
+  if (
+    req.query.description === "Javascript developer" ||
+    req.query.location === "Germany"
+  ) {
+    jsonResponse(false, res);
+  } else {
+    jsonResponse(true, res);
+  }
 });
 
 const PORT = process.env.PORT || 5000;
@@ -28,3 +35,29 @@ const server = app.listen(
 process.on("unhandledRejection", (err, promise) => {
   console.log(`Error: ${err.message}`);
 });
+
+const jsonResponse = (search, res) => {
+  res.json(
+    shuffle(
+      JSON.parse(
+        fs.readFileSync(
+          path.resolve(
+            __dirname,
+            search ? "_data/feed.json" : "_data/searchFeed.json"
+          )
+        )
+      )
+    )
+  );
+};
+
+function shuffle(sourceArray) {
+  for (var i = 0; i < sourceArray.length - 1; i++) {
+    var j = i + Math.floor(Math.random() * (sourceArray.length - i));
+
+    var temp = sourceArray[j];
+    sourceArray[j] = sourceArray[i];
+    sourceArray[i] = temp;
+  }
+  return sourceArray;
+}
